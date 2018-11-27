@@ -73,7 +73,7 @@ public class CropImage extends MonitoredActivity {
     public static final  String ACTION_INLINE_DATA     = "inline-data";
 
     // These are various options can be specified in the intent.
-    private       Bitmap.CompressFormat mOutputFormat    = Bitmap.CompressFormat.JPEG;
+    private       Bitmap.CompressFormat mOutputFormat    = Bitmap.CompressFormat.PNG;
     private       Uri                   mSaveUri         = null;
     private       boolean               mDoFaceDetection = true;
     private       boolean               mCircleCrop      = false;
@@ -422,7 +422,7 @@ public class CropImage extends MonitoredActivity {
             try {
                 outputStream = mContentResolver.openOutputStream(mNewUri);
                 if (outputStream != null) {
-                    croppedImage.compress(mOutputFormat, 90, outputStream);
+                    croppedImage.compress(mOutputFormat, 100, outputStream);
                 }
             } catch (IOException ex) {
 

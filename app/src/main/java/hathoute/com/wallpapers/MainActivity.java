@@ -2,8 +2,10 @@ package hathoute.com.wallpapers;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +13,10 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.codemybrainsout.ratingdialog.RatingDialog;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -31,6 +36,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import eu.janmuller.android.simplecropimage.CropImage;
 
@@ -48,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private InterstitialAd mInterstitialAd;
     private AdRequest mAdRequest;
     private ConfigureData configureData;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+
+        preferences = getPreferences(MODE_PRIVATE);
 
         new JsonTask().execute(AppHelper.wallpapersLink + "getwallpapersJSON.php");
     }
@@ -142,7 +151,59 @@ public class MainActivity extends AppCompatActivity {
                 return;
 
             Bitmap bitmap = BitmapFactory.decodeFile(path);
-            AppHelper.setWallpaper(this, bitmap);
+            if(AppHelper.setWallpaper(this, bitmap)) {
+                int count = preferences.getInt("rate_count", 0);
+                int maxCount = preferences.getInt("rate_maxCount", 2);
+                boolean submitted = preferences.getBoolean("rate_submitted", false);
+
+                if(submitted)
+                    return;
+
+                //Build rating dialog
+                if(count > maxCount) {
+                    final RatingDialog ratingDialog = new RatingDialog.Builder(this)
+                            .threshold(4)
+                            .onRatingBarFormSumbit(new RatingDialog.Builder.RatingDialogFormListener() {
+                                @Override
+                                public void onFormSubmitted(String feedback) {
+                                    //Todo: send feedback to MySQL database using php.
+                                    Toast.makeText(MainActivity.this, "Thank you for your time :)", Toast.LENGTH_SHORT).show();
+
+                                    //User submitted feedback, let's remember him.
+                                    SharedPreferences.Editor editor = preferences.edit();
+                                    editor.putBoolean("rate_submitted", true);
+                                    editor.apply();
+                                }
+                            })
+                            .onThresholdCleared(new RatingDialog.Builder.RatingThresholdClearedListener() {
+                                @Override
+                                public void onThresholdCleared(RatingDialog ratingDialog, float rating, boolean thresholdCleared) {
+                                    //Redirect user to Play Store.
+                                    Toast.makeText(MainActivity.this, "Thank you for your time :)", Toast.LENGTH_SHORT).show();
+                                    AppHelper.openRatePage(MainActivity.this);
+
+                                    //User rated, let's remember him
+                                    SharedPreferences.Editor editor = preferences.edit();
+                                    editor.putBoolean("rate_submitted", true);
+                                    editor.apply();
+                                }
+                            }).build();
+
+                    //Show dialog
+                    ratingDialog.show();
+
+                    //MaxCount should now be high, let's use 10
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putInt("rate_maxCount", 10);
+                    editor.putInt("rate_count", 0);
+                    editor.apply();
+
+                } else {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putInt("rate_count", ++count);
+                    editor.apply();
+                }
+            }
         }
     }
 

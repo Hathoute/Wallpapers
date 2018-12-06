@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
-import android.widget.Toast;
 
 public class AdsBackgroundService extends Service {
 
@@ -34,7 +33,6 @@ public class AdsBackgroundService extends Service {
 
     @Override
     public void onDestroy() {
-        /* IF YOU WANT THIS SERVICE KILLED WITH THE APP THEN UNCOMMENT THE FOLLOWING LINE */
         handler.removeCallbacks(runnable);
     }
 

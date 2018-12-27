@@ -419,7 +419,7 @@ public class CategoriesActivity extends AppCompatActivity {
             String[] tokens = result.split("//");
             try {
                 int version = Integer.valueOf(tokens[0]);
-                String message = tokens[1];
+                String message = tokens[1].replace("\\n", "\n");
                 // Show developer message Dialog
                 activity.showDevDialog(message, version);
             } catch (Exception ignored) {}

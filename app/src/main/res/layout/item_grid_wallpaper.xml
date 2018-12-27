@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:id="@+id/rrItem"
     android:paddingLeft="1dp"
     android:paddingRight="1dp"
     android:paddingTop="2dp">

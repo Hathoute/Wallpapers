@@ -15,4 +15,8 @@
     <string name="download_starting">Download is starting&#8230;</string>
     <string name="download_size">Downloading: $/£ </string>
     <string name="download_successful">Download finished successfully</string>
+
+    <string name="wp_author">$Author:£ %author</string>
+    <string name="wp_downloads">$Downloads:£ %downloads</string>
+    <string name="wp_category">$Category:£ %category</string>
 </resources>

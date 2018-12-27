@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private InterstitialAd mInterstitialAd;
     private AdRequest mAdRequest;
     private ConfigureData configureData;
+    private JsonTask jsonTask;
     private SharedPreferences preferences;
 
     @Override
@@ -94,7 +96,22 @@ public class MainActivity extends AppCompatActivity {
 
         preferences = getPreferences(MODE_PRIVATE);
 
-        new JsonTask().execute(AppHelper.wallpapersLink + "getwallpapersJSON.php");
+        jsonTask = new JsonTask(this);
+        jsonTask.execute(AppHelper.wallpapersLink + "getwallpapersJSON.php");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(pd.isShowing())
+            return;
+
+        wallpaperList.clear();
+        wallpaperLinks.clear();
+        mAdapter.notifyDataSetChanged();
+        curRow = 0;
+        jsonTask = new JsonTask(this);
+        jsonTask.execute(AppHelper.wallpapersLink + "getwallpapersJSON.php");
     }
 
     @Override
@@ -102,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if(configureData != null)
             configureData.cancel(true);
+        if(jsonTask != null)
+            jsonTask.cancel(true);
     }
 
     private void populateWallpaperList() {
@@ -166,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                             .onRatingBarFormSumbit(new RatingDialog.Builder.RatingDialogFormListener() {
                                 @Override
                                 public void onFormSubmitted(String feedback) {
-                                    //Todo: send feedback to MySQL database using php.
+                                    new AddFeedback(feedback).execute();
                                     Toast.makeText(MainActivity.this, "Thank you for your time :)", Toast.LENGTH_SHORT).show();
 
                                     //User submitted feedback, let's remember him.
@@ -297,15 +316,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class JsonTask extends AsyncTask<String, String, String> {
+    private static class JsonTask extends AsyncTask<String, String, String> {
+        final WeakReference<MainActivity> weakReference;
+
+        JsonTask(MainActivity activity) {
+            weakReference = new WeakReference<>(activity);
+        }
 
         protected void onPreExecute() {
-            super.onPreExecute();
+            MainActivity activity = weakReference.get();
 
-            pd = new ProgressDialog(MainActivity.this);
-            pd.setMessage("Please wait");
-            pd.setCancelable(false);
-            pd.show();
+            activity.pd = new ProgressDialog(activity);
+            activity.pd.setMessage("Please wait");
+            activity.pd.setCancelable(false);
+            activity.pd.show();
         }
 
         protected String doInBackground(String... params) {
@@ -357,15 +381,18 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if (pd.isShowing()){
-                pd.dismiss();
+            MainActivity activity = weakReference.get();
+            if(activity == null || activity.isFinishing())
+                return;
+
+            if (activity.pd != null && activity.pd.isShowing()){
+                activity.pd.dismiss();
             }
 
             try {
                 JSONObject object = new JSONObject(result);
-                JSONresult = object.getJSONArray("result");
-                populateWallpaperList();
+                activity.JSONresult = object.getJSONArray("result");
+                activity.populateWallpaperList();
             } catch(JSONException e) {
                 e.printStackTrace();
             }

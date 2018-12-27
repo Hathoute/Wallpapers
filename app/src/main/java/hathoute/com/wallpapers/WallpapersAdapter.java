@@ -5,20 +5,29 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.MyViewHolder> {
@@ -32,6 +41,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.My
         public SquareImageView sivWallpaper;
         public ImageButton ibDownload, ibView, ibSet, ibDelete;
         public LinearLayout llContainer;
+        public RelativeLayout rrItem;
 
         public MyViewHolder(View view) {
             super(view);
@@ -41,6 +51,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.My
             ibView = view.findViewById(R.id.ibView);
             ibDelete = view.findViewById(R.id.ibDelete);
             llContainer = view.findViewById(R.id.llContainer);
+            rrItem = view.findViewById(R.id.rrItem);
         }
     }
 
@@ -107,6 +118,11 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.My
                         holder.ibView.setVisibility(View.VISIBLE);
                         holder.ibSet.setVisibility(View.VISIBLE);
                         holder.ibDownload.setVisibility(View.GONE);
+                        // Get wallpaper Id.
+                        int wp_id = Integer.valueOf(wallpaper.name.split("\\.")[0]);
+                        // Execute the AsyncTask so that it adds a row
+                        // with the user IP and wallpaper ID.
+                        new AddDownload(wp_id).execute();
                         showInterstitial();
                     }
 
@@ -150,11 +166,50 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.My
 
             }
         });
+
+        holder.rrItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mActivity, WallpaperActivity.class);
+                intent.putExtra("wallpaper_name", wallpaper.name);
+                mActivity.startActivity(intent);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return wallpaperList.size();
+    }
+
+    private static class AddDownload extends AsyncTask<Void, Void, Void> {
+        String incrementUrl = AppHelper.wallpapersLink + "addDownload.php?wp_id=";
+        final String targetUrl;
+
+        AddDownload(int wpId) {
+            targetUrl = incrementUrl + wpId;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            HttpURLConnection connection = null;
+
+            try {
+                Log.i(AppHelper.APP_TAG, targetUrl);
+                URL url = new URL(targetUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                // This line is added so that the connection is achieved (I guess),
+                // I removed it first but no record could've been saved.
+                connection.getInputStream();
+            } catch (IOException ignored) {
+            } finally {
+                if (connection != null)
+                    connection.disconnect();
+            }
+
+            return null;
+        }
     }
 
     private void showInterstitial() {

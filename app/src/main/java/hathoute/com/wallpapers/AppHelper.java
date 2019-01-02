@@ -20,6 +20,7 @@ public class AppHelper {
 
     public final static int PIC_CROP = 1;
     public final static String wallpapersLink = "http://80.211.97.124/wallpapers/CSGO/";
+    public final static String instagramLink = "https://www.instagram.com/the.whitesmith/";
     public final static String APP_TAG = "CSGOWP";
 
     public static boolean setWallpaper(Context context, Bitmap bitmap) {

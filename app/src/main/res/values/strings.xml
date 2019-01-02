@@ -19,4 +19,6 @@
     <string name="wp_author">$Author:£ %author</string>
     <string name="wp_downloads">$Downloads:£ %downloads</string>
     <string name="wp_category">$Category:£ %category</string>
+
+    <string name="dev_instagram">Developer Instagram</string>
 </resources>

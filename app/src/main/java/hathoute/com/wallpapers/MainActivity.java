@@ -364,6 +364,8 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch(NullPointerException e) {
+                new AddFeedback("null_Main_2").execute();
             } finally {
                 if (connection != null) {
                     connection.disconnect();
@@ -395,6 +397,8 @@ public class MainActivity extends AppCompatActivity {
                 activity.populateWallpaperList();
             } catch(JSONException e) {
                 e.printStackTrace();
+            } catch(NullPointerException e) {
+                new AddFeedback("null_Main_1").execute();
             }
         }
     }

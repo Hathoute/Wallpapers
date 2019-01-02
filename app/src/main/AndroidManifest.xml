@@ -20,7 +20,8 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-9871252548902893~4870863822" />
 
-        <activity android:name=".CategoriesActivity" />
+        <activity android:name=".CategoriesActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".MainActivity" />
         <activity android:name="eu.janmuller.android.simplecropimage.CropImage" />
 

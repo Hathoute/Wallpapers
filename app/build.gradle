@@ -6,8 +6,8 @@ android {
         applicationId "hathoute.com.wallpapers"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 11
-        versionName "2.1"
+        versionCode 12
+        versionName "2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

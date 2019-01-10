@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:padding="10dp"
+    android:background="@drawable/grey_gradient"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Report Wallpaper"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:gravity="center_horizontal"/>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="20dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="40sp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:id="@+id/etUserMail"
+        android:text=""
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/grey_500"
+        android:inputType="textEmailAddress"
+        android:hint="@string/report_email"
+        android:background="@drawable/dialog_edittext"
+        android:maxLines="1"/>
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="10dp" />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:id="@+id/etReason"
+        android:text=""
+        android:textColor="@color/white"
+        android:textColorHint="@color/grey_500"
+        android:hint="@string/report_reason"
+        android:background="@drawable/dialog_edittext"
+        android:textSize="16sp"
+        android:maxLines="2"/>
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="20dp" />
+
+    <Button
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bDismiss"
+        android:text="@string/report_submit"
+        android:textColor="@color/white"
+        android:layout_gravity="center_horizontal"/>
+</LinearLayout>

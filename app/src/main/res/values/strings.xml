@@ -6,11 +6,20 @@
     <string name="dialog_yes">Yes</string>
     <string name="dialog_refresh">Refresh</string>
     <string name="dialog_cancel">Cancel</string>
-
+    <string name="report_email">E-mail</string>
+    <string name="report_reason">Report reason.</string>
+    <string name="report_submit">Submit</string>
+    <string name="report_successful">Report was sent successfully</string>
+    <string name="error_mail_incorrect">Please enter a valid mail address.</string>
+    <string name="error_report_empty">Report cannot be empty.</string>
+    <string name="error_report_short">Report message is too short.</string>
+    <string name="error_report_long">Report message is too long.</string>
+    <string name="error_already_reported">You have already reported this wallpaper.</string>
     <string name="ib_delete">Delete</string>
     <string name="ib_open">View</string>
     <string name="ib_download">Download</string>
     <string name="ib_set">Set as wallpaper</string>
+    <string name="ib_report">Report</string>
 
     <string name="download_starting">Download is starting&#8230;</string>
     <string name="download_size">Downloading: $/£ </string>

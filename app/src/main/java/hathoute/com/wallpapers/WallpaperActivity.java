@@ -39,7 +39,7 @@ public class WallpaperActivity extends AppCompatActivity {
     private String wallpaperName;
     private ProgressDialog pd;
     private TextView tvDownloads, tvAuthor, tvCategory;
-    private LinearLayout llDelete, llDownload, llView, llSet;
+    private LinearLayout llDelete, llReport, llDownload, llView, llSet;
     private SquareImageView sivWallpaper;
     private Wallpaper wallpaper;
     private SharedPreferences preferences;
@@ -61,6 +61,7 @@ public class WallpaperActivity extends AppCompatActivity {
         tvCategory = findViewById(R.id.tvWpCategory);
 
         llDelete = findViewById(R.id.llDelete);
+        llReport = findViewById(R.id.llReport);
         llDownload = findViewById(R.id.llDownload);
         llView = findViewById(R.id.llView);
         llSet = findViewById(R.id.llSet);
@@ -119,6 +120,29 @@ public class WallpaperActivity extends AppCompatActivity {
                 llSet.setVisibility(View.GONE);
                 llView.setVisibility(View.GONE);
                 llDownload.setVisibility(View.VISIBLE);
+            }
+        });
+        llReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String key = "reported_" + wallpaperName.split("\\.")[0];
+                boolean prevReported = preferences.getBoolean(key, false);
+                if(prevReported) {
+                    Toast.makeText(WallpaperActivity.this,
+                            R.string.error_already_reported, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                new ReportDialog(WallpaperActivity.this, new ReportDialog.OnSubmitListener() {
+                    @Override
+                    public void onSubmit() {
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putBoolean(key, true);
+                        editor.apply();
+                        Toast.makeText(WallpaperActivity.this,
+                                R.string.report_successful, Toast.LENGTH_LONG).show();
+                    }
+                }).show();
             }
         });
         llView.setOnClickListener(new View.OnClickListener() {

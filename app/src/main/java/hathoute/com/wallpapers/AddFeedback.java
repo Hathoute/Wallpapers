@@ -1,7 +1,6 @@
 package hathoute.com.wallpapers;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -20,7 +19,6 @@ public class AddFeedback extends AsyncTask<Void, Void, Void> {
         HttpURLConnection connection = null;
 
         try {
-            Log.i(AppHelper.APP_TAG, feedbackUrl + feedback);
             URL url = new URL(feedbackUrl + feedback);
             connection = (HttpURLConnection) url.openConnection();
             connection.connect();

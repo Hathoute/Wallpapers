@@ -29,7 +29,7 @@ public class SplashActivity extends AppCompatActivity {
         Thread splashTimer = new Thread() {
             public void run() {
                 Random ran = new Random();
-                Integer sleeptime = 3000 + ran.nextInt(3000);
+                int sleeptime = 2000 + ran.nextInt(2000);
                 try {
                     sleep(sleeptime);
                 }catch(InterruptedException e){

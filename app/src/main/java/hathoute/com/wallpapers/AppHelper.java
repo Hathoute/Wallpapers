@@ -1,17 +1,28 @@
 package hathoute.com.wallpapers;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Locale;
 
 import eu.janmuller.android.simplecropimage.CropImage;
@@ -22,6 +33,48 @@ public class AppHelper {
     public final static String wallpapersLink = "http://80.211.97.124/wallpapers/CSGO/";
     public final static String instagramLink = "https://www.instagram.com/the.whitesmith/";
     public final static String APP_TAG = "CSGOWP";
+    public final static String FOLDER_NAME = "CSGOWallpapers";
+    public final static int PERMISSION_WRITE = 1;
+
+
+    public static boolean canSave(Context context) {
+        int result = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        // Using 'or' since we don't have to ask for Permissions in versions older than API 23.
+        return (result == PackageManager.PERMISSION_GRANTED) ||
+                (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1);
+    }
+
+    public static void askForWritePermission(Activity activity) {
+        ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE);
+    }
+
+    public static void saveImage(Context context, Wallpaper wallpaper) {
+        File sourceLocation = wallpaper.getFile(context);
+        File targetLocation = new File(Environment.getExternalStorageDirectory(),
+                AppHelper.FOLDER_NAME);
+        if(!targetLocation.exists())
+            if(!targetLocation.mkdir())
+                return;
+
+        targetLocation = new File(targetLocation, wallpaper.name);
+
+        try {
+            InputStream in = new FileInputStream(sourceLocation);
+            OutputStream out = new FileOutputStream(targetLocation);
+
+            // Copy the bits from inStream to outStream
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        } catch(IOException ignored) {
+        }
+    }
 
     public static boolean setWallpaper(Context context, Bitmap bitmap) {
         WallpaperManager myWallpaperManager

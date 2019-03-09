@@ -1,7 +1,6 @@
 package hathoute.com.wallpapers;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -21,7 +20,6 @@ public class AddInteraction extends AsyncTask<Void, Void, Void> {
         HttpURLConnection connection = null;
 
         try {
-            Log.i(AppHelper.APP_TAG, interactionUrl + interaction);
             URL url = new URL(interactionUrl + interaction);
             connection = (HttpURLConnection) url.openConnection();
             connection.connect();

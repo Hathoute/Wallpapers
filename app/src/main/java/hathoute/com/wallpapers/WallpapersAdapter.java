@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -195,7 +194,6 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.My
             HttpURLConnection connection = null;
 
             try {
-                Log.i(AppHelper.APP_TAG, targetUrl);
                 URL url = new URL(targetUrl);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();

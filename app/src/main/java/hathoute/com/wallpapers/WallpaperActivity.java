@@ -1,13 +1,18 @@
 package hathoute.com.wallpapers;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -24,9 +29,12 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -148,8 +156,27 @@ public class WallpaperActivity extends AppCompatActivity {
         llView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Open Image in Gallery app.
-                AppHelper.showImage(WallpaperActivity.this, wallpaper);
+                // Create a Dialog using DialogHelper
+                DialogHelper dialogHelper = new DialogHelper(WallpaperActivity.this,
+                        R.string.dialog_viewsave, R.string.open, R.string.save,
+                        new DialogHelper.OnChoiceListener() {
+                    @Override
+                    public void onChoice(boolean accepted) {
+                        if(accepted) {
+                            // accepted = true -> User wants to open the Wallpaper image.
+                            AppHelper.showImage(WallpaperActivity.this, wallpaper);
+                        } else {
+                            // accepted = false -> Save the wallpaper to gallery.
+                            if(AppHelper.canSave(WallpaperActivity.this)) {
+                                AppHelper.saveImage(WallpaperActivity.this, wallpaper);
+                            } else {
+                                AppHelper.askForWritePermission(WallpaperActivity.this);
+                            }
+                        }
+                    }
+                });
+                // Show the dialog to the user.
+                dialogHelper.show();
             }
         });
         llSet.setOnClickListener(new View.OnClickListener() {
@@ -251,6 +278,28 @@ public class WallpaperActivity extends AppCompatActivity {
                     editor.putInt("rate_count", ++count);
                     editor.apply();
                 }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case AppHelper.PERMISSION_WRITE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted! Save the wallpaper.
+                    AppHelper.saveImage(WallpaperActivity.this, wallpaper);
+                } else {
+                    // Permission denied... Display a Toast.
+                    Toast.makeText(WallpaperActivity.this,
+                            "Permission denied to write to your External storage",
+                            Toast.LENGTH_SHORT).show();
+                }
+                break;
             }
         }
     }

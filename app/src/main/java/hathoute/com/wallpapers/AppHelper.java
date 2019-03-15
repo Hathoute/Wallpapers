@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,6 +12,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -36,6 +38,14 @@ public class AppHelper {
     public final static String FOLDER_NAME = "CSGOWallpapers";
     public final static int PERMISSION_WRITE = 1;
 
+
+    public static void addImageGallery(Context context, File file) {
+        // Get image path and update Gallery database.
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DATA, file.getAbsolutePath());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    }
 
     public static boolean canSave(Context context) {
         int result = ContextCompat.checkSelfPermission(context,
@@ -72,6 +82,10 @@ public class AppHelper {
             }
             in.close();
             out.close();
+
+            // We are here, It means that the file got saved.
+            // Insert image data to gallery database.
+            addImageGallery(context, targetLocation);
         } catch(IOException ignored) {
         }
     }

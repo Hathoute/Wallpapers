@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
+def appId = "hathoute.com.wallpapers"
+ext.appId = appId
+
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "hathoute.com.wallpapers"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 14
-        versionName "2.3.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -15,6 +15,28 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "default"
+    productFlavors {
+        csgo {
+            applicationId appId
+            versionCode 14
+            versionName "2.3.1"
+            buildConfigField "String", "SERVER_IP", "\"" + "80.211.97.124" + "\""
+            buildConfigField "String", "APP_PREFIX", "\"" + "CSGO" + "\""
+            buildConfigField "String", "AD_MAIN", "\"ca-app-pub-9871252548902893/7480166558\""
+            buildConfigField "String", "AD_CATEGORY", "\"ca-app-pub-9871252548902893/8821168389\""
+        }
+
+        rl {
+            applicationId appId + ".rl"
+            versionCode 1
+            versionName "1.0.0"
+            buildConfigField "String", "SERVER_IP", "\"" + "80.211.97.124" + "\""
+            buildConfigField "String", "APP_PREFIX", "\"" + "RL" + "\""
+            buildConfigField "String", "AD_MAIN", "\"ca-app-pub-9871252548902893/8096068284\""
+            buildConfigField "String", "AD_CATEGORY", "\"ca-app-pub-9871252548902893/4759458506\""
         }
     }
     useLibrary 'org.apache.http.legacy'

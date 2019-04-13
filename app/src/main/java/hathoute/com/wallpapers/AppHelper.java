@@ -32,12 +32,23 @@ import eu.janmuller.android.simplecropimage.CropImage;
 public class AppHelper {
 
     public final static int PIC_CROP = 1;
-    public final static String wallpapersLink = "http://80.211.97.124/wallpapers/CSGO/";
+    public final static String wallpapersLink = "http://" + BuildConfig.SERVER_IP +
+            "/wallpapers/" + BuildConfig.APP_PREFIX + "/";
     public final static String instagramLink = "https://www.instagram.com/the.whitesmith/";
-    public final static String APP_TAG = "CSGOWP";
-    public final static String FOLDER_NAME = "CSGOWallpapers";
+    public final static String APP_TAG = BuildConfig.APP_PREFIX + "WP";
+    public final static String FOLDER_NAME = BuildConfig.APP_PREFIX + "Wallpapers";
     public final static int PERMISSION_WRITE = 1;
 
+
+    public static void openStorePage(Context context, String packageName) {
+        try {
+            context.startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("market://details?id=" + packageName)));
+        } catch (android.content.ActivityNotFoundException e) {
+            context.startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + packageName)));
+        }
+    }
 
     public static void addImageGallery(Context context, File file) {
         // Get image path and update Gallery database.

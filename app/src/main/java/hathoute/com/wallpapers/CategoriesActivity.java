@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
@@ -78,6 +79,7 @@ public class CategoriesActivity extends AppCompatActivity {
         adBanner.loadAd(new AdRequest.Builder().build());
 
         setupFAB();
+        setupFABApps();
 
         String parentName = "Categories";
         try {
@@ -204,7 +206,19 @@ public class CategoriesActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(CategoriesActivity.this, OfflineActivity.class));
+                startActivity(new Intent(
+                        CategoriesActivity.this, OfflineActivity.class));
+            }
+        });
+    }
+
+    private void setupFABApps() {
+        FloatingActionButton fab = findViewById(R.id.fabApps);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(
+                        CategoriesActivity.this, MyAppsActivity.class));
             }
         });
     }
@@ -485,7 +499,7 @@ public class CategoriesActivity extends AppCompatActivity {
 
     private void showInterstitial() {
         final InterstitialAd mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-9871252548902893/7480166558");
+        mInterstitialAd.setAdUnitId(BuildConfig.AD_MAIN);
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
         mInterstitialAd.setAdListener(new AdListener() {
             @Override

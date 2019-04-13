@@ -30,6 +30,18 @@
         android:backgroundTint="@color/colorPrimary"
         android:tint="@color/colorAccent"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fabApps"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@id/fab"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="30dp"
+        android:src="@android:drawable/btn_star_big_on"
+        android:backgroundTint="@color/colorPrimary"
+        android:tint="@color/colorAccent"/>
+
     <com.google.android.gms.ads.AdView
         xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adBanner"
@@ -38,7 +50,7 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-9871252548902893/8821168389"/>
+        ads:adUnitId="@string/ad_category"/>
 
 
 </RelativeLayout>

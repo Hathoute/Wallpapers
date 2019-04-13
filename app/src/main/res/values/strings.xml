@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Wallpapers</string>
+    <string name="app_name">CSGO Wallpapers</string>
 
     <string name="offline_notice">No connection could be established.\n
         Do you want to browse downloaded Wallpapers?</string>
@@ -34,4 +34,14 @@
     <string name="wp_category">$Category:£ %category</string>
 
     <string name="dev_instagram">Developer Instagram</string>
+
+    <string name="ad_main">ca-app-pub-9871252548902893/7480166558</string>
+    <string name="ad_category">ca-app-pub-9871252548902893/8821168389</string>
+
+    <!-- My Apps -->
+    <string name="app_csgo">CSGO Wallpapers</string>
+    <string name="csgo_package">hathoute.com.wallpapers</string>
+
+    <string name="app_rl">RL Wallpapers</string>
+    <string name="rl_package">hathoute.com.wallpapers.rl</string>
 </resources>

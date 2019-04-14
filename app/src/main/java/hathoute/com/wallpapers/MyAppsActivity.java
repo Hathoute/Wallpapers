@@ -1,6 +1,7 @@
 package hathoute.com.wallpapers;
 
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +25,10 @@ public class MyAppsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_apps);
+
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+            actionBar.setTitle("Other Apps");
 
         gridApps = findViewById(R.id.gvApps);
         final CustomGridAdapter gridAdapter = new CustomGridAdapter(this, wpApps);

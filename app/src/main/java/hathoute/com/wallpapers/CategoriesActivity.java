@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
@@ -52,14 +51,12 @@ public class CategoriesActivity extends AppCompatActivity {
     private ProgressDialog pd;
     private List<Category> categoryList;
     private List<String[]> categoryLinks;
-    private CategoriesAdapter mAdapter;
     private JSONArray JSONresult;
     private String parentCategory;
     private boolean isLoading = false;
     private boolean rowsEnd = false;
     private ConfigureData configureData;
     private JsonTask jsonTask;
-    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +65,7 @@ public class CategoriesActivity extends AppCompatActivity {
 
         // The purpose of toolbar is just to add Instagram
         // button so that users could follow me easily.
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         // Setting toolbar as SupportActionBar
         setSupportActionBar(toolbar);
 
@@ -99,7 +96,7 @@ public class CategoriesActivity extends AppCompatActivity {
         rvCategories = findViewById(R.id.rvCategories);
         categoryList = new ArrayList<>();
         categoryLinks = new ArrayList<>();
-        mAdapter = new CategoriesAdapter(this, categoryList);
+        CategoriesAdapter mAdapter = new CategoriesAdapter(this, categoryList);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         rvCategories.setLayoutManager(mLayoutManager);
         rvCategories.setItemAnimator(new DefaultItemAnimator());
@@ -242,7 +239,7 @@ public class CategoriesActivity extends AppCompatActivity {
             }
         }
 
-        configureData = new ConfigureData();
+        configureData = new ConfigureData(this);
         configureData.execute();
         addRecyclerViewListener();
     }
@@ -254,7 +251,7 @@ public class CategoriesActivity extends AppCompatActivity {
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if (!recyclerView.canScrollVertically(1) && !isLoading && !rowsEnd) {
-                    configureData = new ConfigureData();
+                    configureData = new ConfigureData(CategoriesActivity.this);
                     configureData.execute();
                 }
             }
@@ -263,22 +260,39 @@ public class CategoriesActivity extends AppCompatActivity {
 
     int curRow = 0;
 
-    private class ConfigureData extends AsyncTask<Void, Category, Boolean> {
-        private CategoriesAdapter categoriesAdapter;
-        int lastRow = curRow;
+    private static class ConfigureData extends AsyncTask<Void, Category, Boolean> {
+        private final CategoriesAdapter categoriesAdapter;
+        private final WeakReference<CategoriesActivity> activityWeakReference;
+        int lastRow;
+
+        private ConfigureData(CategoriesActivity activity) {
+            activityWeakReference = new WeakReference<>(activity);
+            lastRow = activity.curRow;
+            categoriesAdapter = (CategoriesAdapter) activity.rvCategories.getAdapter();
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            isLoading = true;
-            categoriesAdapter = (CategoriesAdapter) rvCategories.getAdapter();
+            CategoriesActivity activity = activityWeakReference.get();
+            if(activity == null || activity.isFinishing()) {
+                this.cancel(true);
+                return;
+            }
+            activity.isLoading = true;
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            while(curRow < lastRow+10) {
+            CategoriesActivity activity = activityWeakReference.get();
+            if(activity == null || activity.isFinishing()) {
+                this.cancel(true);
+                return false;
+            }
+
+            while(activity.curRow < lastRow+10) {
                 try {
-                    String[] row = categoryLinks.get(curRow);
+                    String[] row = activity.categoryLinks.get(activity.curRow);
                     Category category = new Category(row[0], row[1], row[3], row[2].equals("main"));
                     Bitmap thumbnail = getBitmapFromURL(category.thumbLink);
                     if(thumbnail == null)
@@ -289,25 +303,35 @@ public class CategoriesActivity extends AppCompatActivity {
                 } catch (IndexOutOfBoundsException ignored) {
                     return true;
                 } catch (Exception ignored) {
-                    categoryLinks.remove(curRow);
+                    activity.categoryLinks.remove(activity.curRow);
                     lastRow--;
                     continue;
                 }
-                curRow++;
+                activity.curRow++;
             }
             return false;
         }
 
         @Override
         protected void onProgressUpdate(Category... categories) {
-            categoryList.add(categories[0]);
+            CategoriesActivity activity = activityWeakReference.get();
+            if(activity == null || activity.isFinishing()) {
+                this.cancel(true);
+                return;
+            }
+            activity.categoryList.add(categories[0]);
             categoriesAdapter.notifyDataSetChanged();
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
-            rowsEnd = result;
-            isLoading = false;
+            CategoriesActivity activity = activityWeakReference.get();
+            if(activity == null || activity.isFinishing()) {
+                this.cancel(true);
+                return;
+            }
+            activity.rowsEnd = result;
+            activity.isLoading = false;
         }
 
         private Bitmap getBitmapFromURL(String url) {

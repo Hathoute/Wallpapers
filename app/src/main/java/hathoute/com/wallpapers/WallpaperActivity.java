@@ -1,6 +1,5 @@
 package hathoute.com.wallpapers;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,9 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -24,17 +21,13 @@ import android.widget.Toast;
 import com.codemybrainsout.ratingdialog.RatingDialog;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -82,7 +75,7 @@ public class WallpaperActivity extends AppCompatActivity {
         // wallpaperName contains the wallpaperId and the extension,
         // so we split the name and we take the wallpaperId.
         String wallpaperId = wallpaperName.split("\\.")[0];
-        new ConfigureViews(wallpaperId).execute();
+        new ConfigureViews(this, wallpaperId).execute();
     }
 
     private void applyWallpaper() {
@@ -121,7 +114,14 @@ public class WallpaperActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Get file object and delete it.
                 File file = wallpaper.getFile(WallpaperActivity.this);
-                file.delete();
+                if(file.delete()) {
+                    Toast.makeText(WallpaperActivity.this,
+                            "Wallpaper deleted successfully.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(WallpaperActivity.this,
+                            "Something went wrong. Try again.", Toast.LENGTH_SHORT).show();
+                }
+
                 // We need to show the Download button now,
                 // and hide other buttons
                 llDelete.setVisibility(View.GONE);
@@ -304,21 +304,26 @@ public class WallpaperActivity extends AppCompatActivity {
         }
     }
 
-    private class ConfigureViews extends AsyncTask<Void, String, String> {
+    private static class ConfigureViews extends AsyncTask<Void, String, String> {
 
         final String phpScriptLink;
+        final WeakReference<WallpaperActivity> activityWeakReference;
 
-        ConfigureViews(String wallpaperId) {
+        ConfigureViews(WallpaperActivity activity, String wallpaperId) {
             phpScriptLink = AppHelper.wallpapersLink + "getWallpaperInfo.php?wp_id=" + wallpaperId;
+            activityWeakReference = new WeakReference<>(activity);
         }
 
         protected void onPreExecute() {
             super.onPreExecute();
+            WallpaperActivity activity = activityWeakReference.get();
+            if(activity == null || activity.isFinishing())
+                return;
 
-            pd = new ProgressDialog(WallpaperActivity.this);
-            pd.setMessage("Please wait");
-            pd.setCancelable(false);
-            pd.show();
+            activity.pd = new ProgressDialog(activity);
+            activity.pd.setMessage("Please wait");
+            activity.pd.setCancelable(false);
+            activity.pd.show();
         }
 
         protected String doInBackground(Void... voids) {
@@ -369,8 +374,13 @@ public class WallpaperActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (pd.isShowing()){
-                pd.dismiss();
+
+            WallpaperActivity activity = activityWeakReference.get();
+            if(activity == null || activity.isFinishing())
+                return;
+
+            if (activity.pd != null && activity.pd.isShowing()){
+                activity.pd.dismiss();
             }
 
             // Result is null, no need to continue;
@@ -380,7 +390,7 @@ public class WallpaperActivity extends AppCompatActivity {
                 return;
 
             try {
-                Resources resources = getResources();
+                Resources resources = activity.getResources();
                 JSONArray JSONResult = new JSONObject(result).getJSONArray("result");
                 JSONObject object = JSONResult.getJSONObject(0);
 
@@ -389,19 +399,19 @@ public class WallpaperActivity extends AppCompatActivity {
                 String tvText = resources.getString(R.string.wp_author)
                         .replace("$", "<b>").replace("£", "</b>")
                         .replace("%author", data);
-                tvAuthor.setText(Html.fromHtml(tvText));
+                activity.tvAuthor.setText(Html.fromHtml(tvText));
 
                 data = object.getString("dl_times");
                 tvText = resources.getString(R.string.wp_downloads)
                         .replace("$", "<b>").replace("£", "</b>")
                         .replace("%downloads", data);
-                tvDownloads.setText(Html.fromHtml(tvText));
+                activity.tvDownloads.setText(Html.fromHtml(tvText));
 
                 data = object.getString("category");
                 tvText = resources.getString(R.string.wp_category)
                         .replace("$", "<b>").replace("£", "</b>")
                         .replace("%category", data);
-                tvCategory.setText(Html.fromHtml(tvText));
+                activity.tvCategory.setText(Html.fromHtml(tvText));
 
             } catch(Exception e) {
                 e.printStackTrace();

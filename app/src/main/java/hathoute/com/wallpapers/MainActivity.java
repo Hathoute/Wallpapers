@@ -360,8 +360,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch(NullPointerException e) {
-                new AddFeedback("null_Main_2").execute();
             } finally {
                 if (connection != null) {
                     connection.disconnect();
@@ -379,12 +377,32 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            MainActivity activity = weakReference.get();
+            final MainActivity activity = weakReference.get();
             if(activity == null || activity.isFinishing())
                 return;
 
             if (activity.pd != null && activity.pd.isShowing()){
                 activity.pd.dismiss();
+            }
+
+            if(result == null) {
+                new DialogHelper(activity,
+                        R.string.offline_notice, R.string.dialog_yes, R.string.dialog_refresh,
+                        new DialogHelper.OnChoiceListener() {
+                            @Override
+                            public void onChoice(boolean accepted) {
+                                if(accepted) {
+                                    activity.startActivity(new Intent(
+                                            activity, OfflineActivity.class));
+                                    activity.finish();
+                                } else {
+                                    activity.jsonTask = new MainActivity.JsonTask(activity);
+                                    activity.jsonTask.execute(AppHelper.wallpapersLink
+                                            + "getwallpapersJSON.php");
+                                }
+                            }
+                        }).show();
+                return;
             }
 
             try {
@@ -393,8 +411,6 @@ public class MainActivity extends AppCompatActivity {
                 activity.populateWallpaperList();
             } catch(JSONException e) {
                 e.printStackTrace();
-            } catch(NullPointerException e) {
-                new AddFeedback("null_Main_1").execute();
             }
         }
     }

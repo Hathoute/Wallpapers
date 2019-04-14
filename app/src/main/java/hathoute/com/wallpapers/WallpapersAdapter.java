@@ -77,7 +77,11 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.My
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Wallpaper wallpaper = wallpaperList.get(position);
-        holder.sivWallpaper.setImageBmp(wallpaper.thumbnail);
+        try {
+            holder.sivWallpaper.setImageBmp(wallpaper.thumbnail);
+        } catch(NullPointerException e) {
+            new AddInteraction("null@wpadapter").execute();
+        }
         Palette.from(wallpaper.thumbnail).generate(new Palette.PaletteAsyncListener() {
             @Override
             public void onGenerated(@Nullable Palette palette) {
